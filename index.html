@@ -195,7 +195,7 @@
                     <div v-for="agre in uniqueAgres" :key="agre" @click="toggleCategory(agre, getActions(agre)[0]); isSidebarOpen = true" 
                          class="agre-card group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all h-64 relative">
                         <div class="absolute inset-0 bg-gray-200">
-                             <img :src="'IMAGES/' + agre + '.jpg'" class="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all duration-700">
+                             <img :src="'images/' + agre + '.jpg'" class="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all duration-700">
                         </div>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                         <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
