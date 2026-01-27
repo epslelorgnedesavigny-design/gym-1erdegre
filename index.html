@@ -62,14 +62,14 @@
                 <h2 class="text-4xl font-black text-slate-300 uppercase mb-12 italic text-center">Choisissez un agrès</h2>
                 <div class="grid md:grid-cols-3 gap-10 w-full px-4">
                     <div v-for="a in ['SOL', 'POUTRE', 'BARRES']" @click="openAgre(a)" class="group bg-white rounded-[3rem] shadow-2xl hover:scale-105 transition cursor-pointer overflow-hidden border-b-[12px]" :class="'border-'+a">
-                        <img :src="'IMAGES/' + a + '.jpg'" class="w-full h-80 object-cover group-hover:opacity-90 transition duration-500">
+                        <img :src="'images/' + a + '.jpg'" class="w-full h-80 object-cover group-hover:opacity-90 transition duration-500">
                     </div>
                 </div>
             </div>
 
             <div v-else class="max-w-4xl mx-auto space-y-10 pb-20">
                 <div @click="openModal(curr, 'Élément')" class="bg-black rounded-[3rem] overflow-hidden shadow-2xl relative aspect-video border-[10px] border-white group cursor-pointer">
-                    <img :src="'IMAGES/'+currentFile(curr, globalView)" class="w-full h-full object-contain">
+                    <img :src="'images/'+currentFile(curr, globalView)" class="w-full h-full object-contain">
                     <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i class="fas fa-expand text-white text-5xl"></i></div>
                 </div>
 
@@ -103,7 +103,7 @@
                     <h4 class="text-lg font-black text-slate-600 uppercase tracking-widest mb-6 italic border-l-8 border-blue-400 pl-4">Progression suggérée</h4>
                     <div class="flex gap-6 overflow-x-auto pb-6 hide-scrollbar">
                         <div v-for="(et, index) in curr.etapes" @click="openModal(et, 'Étape')" class="w-72 shrink-0 bg-white p-4 rounded-[2.5rem] border shadow-sm cursor-pointer hover:border-blue-500 transition">
-                            <img :src="'IMAGES/'+(et.media.face || et.media.profil)" class="rounded-[1.5rem] aspect-video object-cover mb-4">
+                            <img :src="'images/'+(et.media.face || et.media.profil)" class="rounded-[1.5rem] aspect-video object-cover mb-4">
                             <p class="text-[11px] font-bold uppercase text-slate-600">
                                 <span class="text-blue-600 font-black">ÉTAPE {{ index + 1 }} :</span> {{ et.nom }}
                             </p>
@@ -115,7 +115,7 @@
                     <h4 class="text-lg font-black text-rose-500 uppercase tracking-widest mb-6 italic border-l-8 border-rose-400 pl-4">Erreurs courantes</h4>
                     <div class="flex gap-4 overflow-x-auto pb-6 hide-scrollbar">
                         <div v-for="er in curr.erreurs" @click="openModal(er, 'Erreur')" class="w-64 shrink-0 bg-white p-3 rounded-[2rem] border-2 border-rose-50 shadow-sm cursor-pointer hover:border-rose-400 transition">
-                            <img :src="'IMAGES/'+(er.media.face || er.media.profil)" class="rounded-2xl aspect-video object-cover mb-3">
+                            <img :src="'images/'+(er.media.face || er.media.profil)" class="rounded-2xl aspect-video object-cover mb-3">
                             <p class="text-[10px] font-black uppercase text-center text-rose-600">{{ er.titre }}</p>
                         </div>
                     </div>
@@ -130,7 +130,7 @@
                 <button @click="closeModal" class="absolute top-6 right-6 z-10 w-12 h-12 bg-black/10 rounded-full flex items-center justify-center hover:bg-black/20 transition"><i class="fas fa-times text-xl"></i></button>
                 
                 <div class="md:w-1/2 bg-black flex items-center justify-center aspect-video md:aspect-auto">
-                    <img :src="'IMAGES/'+currentFile(modal.data, modalView)" class="w-full h-full object-contain">
+                    <img :src="'images/'+currentFile(modal.data, modalView)" class="w-full h-full object-contain">
                 </div>
                 
                 <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center overflow-y-auto hide-scrollbar">
