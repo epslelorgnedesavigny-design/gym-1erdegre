@@ -2,64 +2,41 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gymnastique à l'école</title>
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gymnastique École 🤸‍♀️</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    
     <script src="gym_data.js"></script>
-
     <style>
-        body { font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f3f4f6; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
-        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+        .bg-SOL { background-color: #ef4444; } .bg-POUTRE { background-color: #10b981; } .bg-BARRES { background-color: #3b82f6; }
+        .border-SOL { border-color: #ef4444; } .border-POUTRE { border-color: #10b981; } .border-BARRES { border-color: #3b82f6; }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s; }
         .fade-enter-from, .fade-leave-to { opacity: 0; }
-        
-        /* Couleurs Thématiques */
-        .bg-theme-SOL { background-color: #ef4444; }
-        .bg-theme-BARRES { background-color: #3b82f6; }
-        .bg-theme-POUTRE { background-color: #10b981; }
-
-        .agre-card:hover img { transform: scale(1.05); }
     </style>
 </head>
-<body class="h-screen overflow-hidden text-gray-800">
+<body class="bg-slate-50 text-slate-900 h-screen overflow-hidden">
+<div id="app" class="flex h-full">
 
-<div id="app" class="flex h-full relative">
-
-    <aside :class="['bg-white shadow-xl z-30 flex flex-col transition-all duration-300 border-r h-full absolute lg:relative', isSidebarOpen ? 'w-80 translate-x-0' : '-translate-x-full lg:translate-x-0 lg:w-0 lg:overflow-hidden xl:w-80']">
-        <div class="p-4 bg-indigo-600 text-white flex justify-between items-center shrink-0 shadow-md">
-            <h1 class="font-bold text-lg flex items-center gap-2">
-                <span class="text-2xl">🤸‍♀️</span> Gym École
-            </h1>
-            <button @click="isSidebarOpen = false" class="lg:hidden w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors">
-                <i class="fas fa-times"></i>
-            </button>
+    <aside :class="['bg-slate-900 text-white h-full z-40 transition-all flex flex-col shadow-xl absolute lg:relative', isSidebarOpen ? 'w-80' : 'w-0 overflow-hidden lg:w-0']">
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center shrink-0">
+            <h1 class="font-black italic text-xl uppercase tracking-tighter text-blue-400">Gym École 🤸‍♀️</h1>
+            <button @click="isSidebarOpen = false" class="text-slate-500 hover:text-white"><i class="fas fa-times text-xl"></i></button>
         </div>
-
-        <div class="flex-1 overflow-y-auto p-2 bg-white">
-            <div v-for="agre in uniqueAgres" :key="agre" class="mb-6">
-                <div class="font-black text-gray-400 text-xs mb-2 px-2 border-b pb-1 flex items-center justify-between">
-                    {{ agre }}
-                    <span class="text-[10px] bg-gray-100 px-1 rounded">{{ getAgreCount(agre) }} éléments</span>
+        <div class="flex-1 overflow-y-auto p-4 space-y-6">
+            <div v-for="agre in ['SOL', 'POUTRE', 'BARRES']" :key="agre">
+                <div class="flex items-center gap-2 mb-2">
+                    <div :class="['w-2 h-2 rounded-full', 'bg-'+agre]"></div>
+                    <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">{{ agre }}</span>
                 </div>
-                
-                <div v-for="action in getActions(agre)" :key="action" class="mb-1">
-                    <button @click="toggleCategory(agre, action)" 
-                            class="w-full text-left px-3 py-2 rounded flex justify-between items-center hover:bg-gray-50 font-bold text-sm text-gray-700 border border-transparent hover:border-gray-200">
-                        <span>{{ action }}</span>
-                        <i :class="['fas text-xs text-gray-400 transition-transform', openCategory === agre+action ? 'fa-chevron-down rotate-180' : 'fa-chevron-right']"></i>
+                <div v-for="action in getActions(agre)" :key="action">
+                    <button @click="toggleFolder(agre+action)" class="w-full text-left p-2 hover:bg-slate-800 rounded-lg flex justify-between items-center text-xs font-bold transition">
+                        {{ action }} <i :class="['fas fa-chevron-right text-[10px] transition', openFolders.includes(agre+action) ? 'rotate-90 text-blue-400' : '']"></i>
                     </button>
-                    <div v-show="openCategory === agre+action" class="ml-3 border-l-2 border-gray-200 pl-2 mt-1 space-y-1">
-                        <button v-for="elem in getElements(agre, action)" :key="elem.id" @click="selectElement(elem)"
-                                :class="['block w-full text-left text-sm py-2 px-3 rounded transition-colors', currentElement?.id === elem.id ? 'bg-indigo-600 text-white' : 'text-gray-600 hover:bg-gray-100']">
-                            {{ formatName(elem.nom) }}
+                    <div v-show="openFolders.includes(agre+action)" class="ml-4 border-l border-slate-800 pl-2 my-1">
+                        <button v-for="el in getElements(agre, action)" @click="selectElement(el)" :class="['block w-full text-left p-2 text-xs transition', curr?.id === el.id ? 'text-blue-400 font-black bg-slate-800 rounded' : 'text-slate-400 hover:text-white']">
+                            {{ el.nom }}
                         </button>
                     </div>
                 </div>
@@ -67,284 +44,163 @@
         </div>
     </aside>
 
-    <div v-if="isSidebarOpen" @click="isSidebarOpen = false" class="fixed inset-0 bg-black/50 z-20 lg:hidden backdrop-blur-sm"></div>
-
-    <main class="flex-1 flex flex-col h-full w-full relative bg-gray-50 overflow-hidden">
-        
-        <div class="bg-white shadow-sm p-3 flex items-center lg:hidden shrink-0 z-10 justify-between">
-            <div class="flex items-center gap-3">
-                <button @click="isSidebarOpen = !isSidebarOpen" class="text-gray-600 p-2 bg-gray-100 rounded-lg hover:bg-gray-200">
-                    <i class="fas fa-bars text-xl"></i>
-                </button>
-                <span class="font-bold text-gray-800 text-sm truncate max-w-[200px]">
-                    {{ currentElement ? formatName(currentElement.nom) : "Gymnastique à l'école" }}
-                </span>
+    <main class="flex-1 flex flex-col overflow-hidden">
+        <header class="bg-white border-b p-4 flex items-center justify-between px-8 shadow-sm">
+            <div class="flex items-center gap-4">
+                <button @click="isSidebarOpen = true" v-show="!isSidebarOpen" class="text-blue-600 mr-2"><i class="fas fa-bars text-xl"></i></button>
+                <div v-if="curr" class="flex items-center gap-4">
+                    <span :class="['text-[10px] font-black px-2 py-0.5 rounded text-white uppercase', 'bg-'+curr.agre]">{{ curr.agre }}</span>
+                    <span class="font-black uppercase tracking-tight text-xl">{{ curr.nom }}</span>
+                    <span class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-[10px] font-black tracking-widest uppercase ml-2">Difficulté : {{ curr.difficulte }}</span>
+                </div>
             </div>
-            <button v-if="currentElement" @click="currentElement = null" class="text-xs font-bold text-indigo-600 uppercase">
-                <i class="fas fa-home mr-1"></i>Accueil
-            </button>
-        </div>
+            <button @click="curr = null" class="w-10 h-10 rounded-full hover:bg-gray-100 flex items-center justify-center text-gray-400 transition"><i class="fas fa-home text-xl"></i></button>
+        </header>
 
-        <div v-if="currentElement" class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth w-full max-w-7xl mx-auto">
-            <header class="mb-6 bg-white p-6 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                <div class="absolute top-0 right-0 p-2 opacity-10 pointer-events-none select-none">
-                    <span class="text-8xl">🤸‍♀️</span>
-                </div>
-                <div class="flex flex-wrap items-center gap-2 mb-2 relative z-10">
-                    <span :class="['px-2 py-0.5 rounded text-white text-[10px] font-bold uppercase', 'bg-theme-' + currentElement.agre]">{{ currentElement.agre }}</span>
-                    <span class="text-gray-400 text-xs font-bold uppercase">{{ currentElement.action }}</span>
-                    <div class="ml-auto flex items-center gap-2 bg-yellow-50 px-2 py-1 rounded border border-yellow-100">
-                        <span class="text-[10px] text-yellow-600 font-bold uppercase">Niveau de difficulté</span>
-                        <span class="text-yellow-500 text-sm tracking-widest">{{ currentElement.difficulte }}</span>
+        <div class="flex-1 overflow-y-auto p-4 md:p-10">
+            <div v-if="!curr" class="max-w-6xl mx-auto h-full flex flex-col justify-center items-center">
+                <h2 class="text-4xl font-black text-slate-300 uppercase mb-12 italic text-center">Choisissez un agrès</h2>
+                <div class="grid md:grid-cols-3 gap-10 w-full px-4">
+                    <div v-for="a in ['SOL', 'POUTRE', 'BARRES']" @click="openAgre(a)" class="group bg-white rounded-[3rem] shadow-2xl hover:scale-105 transition cursor-pointer overflow-hidden border-b-[12px]" :class="'border-'+a">
+                        <img :src="'IMAGES/' + a + '.jpg'" class="w-full h-80 object-cover group-hover:opacity-90 transition duration-500">
                     </div>
                 </div>
-                <h2 class="text-2xl md:text-4xl font-black text-gray-800 uppercase mb-2 relative z-10">{{ formatName(currentElement.nom) }}</h2>
-                <div v-if="currentElement.prerequis" class="text-xs text-gray-500 bg-gray-100 inline-block px-3 py-1.5 rounded-full border border-gray-200">
-                    <i class="fas fa-link mr-1 text-gray-400"></i>Pré-requis : <span class="font-bold">{{ currentElement.prerequis }}</span>
-                </div>
-            </header>
+            </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div class="bg-gray-900 rounded-2xl overflow-hidden shadow-lg relative aspect-[4/3] group border-4 border-white">
-                        <img :src="currentVideoSrc" class="w-full h-full object-contain bg-black transition-all duration-500" :key="currentView">
-                        <div class="absolute top-4 right-4 bg-black/60 text-white text-[10px] font-bold px-3 py-1 rounded-full backdrop-blur border border-white/20">
-                            {{ currentView === 'face' ? 'VUE DE FACE' : 'VUE DE PROFIL' }}
+            <div v-else class="max-w-4xl mx-auto space-y-10 pb-20">
+                <div @click="openModal(curr, 'Élément')" class="bg-black rounded-[3rem] overflow-hidden shadow-2xl relative aspect-video border-[10px] border-white group cursor-pointer">
+                    <img :src="'IMAGES/'+currentFile(curr, globalView)" class="w-full h-full object-contain">
+                    <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"><i class="fas fa-expand text-white text-5xl"></i></div>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="space-y-6">
+                        <div class="bg-blue-50/50 p-5 rounded-[2.5rem] border border-blue-100 flex items-center gap-3">
+                            <div class="w-7 h-7 shrink-0 bg-blue-600 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-info text-white text-[12px]"></i></div>
+                            <h4 class="text-base font-black text-blue-700 uppercase">Comment faire ?</h4>
                         </div>
-                        <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button @click.stop="forceView('face')" :class="['px-4 py-1.5 rounded-full text-xs font-bold shadow-lg', currentView === 'face' ? 'bg-white text-black' : 'bg-black/60 text-white']">Face</button>
-                            <button @click.stop="forceView('profil')" :class="['px-4 py-1.5 rounded-full text-xs font-bold shadow-lg', currentView === 'profil' ? 'bg-white text-black' : 'bg-black/60 text-white']">Profil</button>
-                        </div>
-                    </div>
-                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r text-sm">
-                        <span class="font-bold text-blue-900 uppercase text-xs block mb-0.5">Matériel nécessaire</span>
-                        <span class="text-blue-800">{{ currentElement.materiels || "Standard" }}</span>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex flex-col">
-                    <h3 class="font-bold text-gray-800 mb-4 flex items-center text-lg">
-                        <span class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center mr-3 text-sm"><i class="fas fa-check"></i></span>
-                        Pour réussir
-                    </h3>
-                    <div class="flex-1">
-                        <p class="text-xs font-bold text-gray-400 uppercase mb-2">Critères de réalisation</p>
-                        <ul class="space-y-3 mb-6">
-                            <li v-for="(crit, i) in cleanList(currentElement.criteres_realisation)" :key="i" class="flex items-start text-sm text-gray-600">
-                                <i class="fas fa-caret-right text-gray-300 mt-1 mr-2"></i> {{ crit }}
+                        <ul class="space-y-3 px-4">
+                            <li v-for="c in curr.criteres_realisation" class="text-sm font-bold text-slate-700 italic flex gap-3">
+                                <i class="fas fa-chevron-right text-blue-400 mt-1 shrink-0"></i> {{ c }}
                             </li>
                         </ul>
                     </div>
-                    <div v-if="cleanList(currentElement.criteres_reussite).length" class="mt-auto pt-6 border-t border-gray-100 bg-gray-50 -mx-6 -mb-6 p-6 rounded-b-2xl">
-                         <h4 class="font-bold text-xs text-green-700 uppercase mb-3 flex items-center">
-                             <i class="fas fa-trophy mr-2"></i>Validation
-                         </h4>
-                         <ul class="space-y-2">
-                            <li v-for="(crit, i) in cleanList(currentElement.criteres_reussite)" :key="i" class="text-gray-700 text-sm font-medium flex items-center">
-                                <i class="fas fa-star text-[10px] mr-2 text-yellow-400"></i> {{ crit }}
+
+                    <div class="space-y-6">
+                        <div class="bg-emerald-50/50 p-5 rounded-[2.5rem] border border-emerald-100 flex items-center gap-3">
+                            <div class="w-7 h-7 shrink-0 bg-emerald-500 rounded-full flex items-center justify-center shadow-md"><i class="fas fa-check text-white text-[12px]"></i></div>
+                            <h4 class="text-base font-black text-emerald-700 uppercase">C'est réussi si...</h4>
+                        </div>
+                        <ul class="space-y-3 px-4">
+                            <li v-for="c in curr.criteres_reussite" class="text-sm font-bold text-slate-700 flex gap-3">
+                                <i class="fas fa-check-circle text-emerald-500 mt-1 shrink-0"></i> {{ c }}
                             </li>
                         </ul>
                     </div>
                 </div>
-            </div>
 
-            <section v-if="currentElement.etapes && currentElement.etapes.length > 0" class="mt-12">
-                <h3 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-                    <i class="fas fa-layer-group text-indigo-500"></i> Étapes d'apprentissage
-                </h3>
-                <div class="flex overflow-x-auto gap-5 pb-8 hide-scrollbar snap-x px-1">
-                    <div v-for="(etape, index) in currentElement.etapes" :key="index" @click="openModal(etape, 'etape', index + 1)"
-                         class="snap-center shrink-0 w-72 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden cursor-pointer hover:shadow-xl transition-all group">
-                        <div class="h-40 bg-gray-100 relative">
-                             <img :src="getMediaThumbnail(etape.media)" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
-                             <div class="absolute top-2 left-2 bg-indigo-600/90 text-white text-[10px] font-bold px-2 py-0.5 rounded">ÉTAPE {{ index + 1 }}</div>
-                        </div>
-                        <div class="p-4">
-                            <h4 class="font-bold text-gray-800 text-sm leading-tight mb-2 line-clamp-2">{{ etape.nom }}</h4>
-                            <div class="text-xs text-indigo-600 font-bold">Voir le détail <i class="fas fa-arrow-right ml-1"></i></div>
+                <section v-if="curr.etapes && curr.etapes.length">
+                    <h4 class="text-lg font-black text-slate-600 uppercase tracking-widest mb-6 italic border-l-8 border-blue-400 pl-4">Progression suggérée</h4>
+                    <div class="flex gap-6 overflow-x-auto pb-6 hide-scrollbar">
+                        <div v-for="(et, index) in curr.etapes" @click="openModal(et, 'Étape')" class="w-72 shrink-0 bg-white p-4 rounded-[2.5rem] border shadow-sm cursor-pointer hover:border-blue-500 transition">
+                            <img :src="'IMAGES/'+(et.media.face || et.media.profil)" class="rounded-[1.5rem] aspect-video object-cover mb-4">
+                            <p class="text-[11px] font-bold uppercase text-slate-600">
+                                <span class="text-blue-600 font-black">ÉTAPE {{ index + 1 }} :</span> {{ et.nom }}
+                            </p>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section v-if="currentElement.erreurs && currentElement.erreurs.length > 0" class="mt-4 mb-20">
-                <h3 class="text-lg font-bold mb-4 text-gray-800 flex items-center gap-2">
-                    <i class="fas fa-exclamation-triangle text-orange-500"></i> Erreurs à éviter
-                </h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                    <div v-for="(err, index) in currentElement.erreurs" :key="index" @click="openModal(err, 'erreur')" 
-                         class="bg-white rounded-xl border border-red-100 p-4 flex gap-4 cursor-pointer hover:shadow-lg transition-all group">
-                        <div class="w-20 h-20 bg-red-50 rounded-lg shrink-0 overflow-hidden">
-                            <img :src="getMediaThumbnail(err.media)" class="w-full h-full object-cover group-hover:scale-110 transition-transform">
-                        </div>
-                        <div class="flex-1 min-w-0 flex flex-col justify-center">
-                            <h4 class="font-bold text-gray-800 text-sm truncate mb-1">{{ err.titre || "Erreur type" }}</h4>
-                            <p class="text-xs text-gray-500 line-clamp-2 italic bg-gray-50 p-1 rounded">"{{ err.indicateur }}"</p>
+                <section v-if="curr.erreurs && curr.erreurs.length">
+                    <h4 class="text-lg font-black text-rose-500 uppercase tracking-widest mb-6 italic border-l-8 border-rose-400 pl-4">Erreurs courantes</h4>
+                    <div class="flex gap-4 overflow-x-auto pb-6 hide-scrollbar">
+                        <div v-for="er in curr.erreurs" @click="openModal(er, 'Erreur')" class="w-64 shrink-0 bg-white p-3 rounded-[2rem] border-2 border-rose-50 shadow-sm cursor-pointer hover:border-rose-400 transition">
+                            <img :src="'IMAGES/'+(er.media.face || er.media.profil)" class="rounded-2xl aspect-video object-cover mb-3">
+                            <p class="text-[10px] font-black uppercase text-center text-rose-600">{{ er.titre }}</p>
                         </div>
                     </div>
-                </div>
-            </section>
-        </div>
-        
-        <div v-else class="flex-1 p-6 md:p-10 overflow-y-auto">
-            <div class="max-w-5xl mx-auto">
-                <h2 class="text-3xl md:text-4xl font-black text-gray-800 mb-2">Bienvenue 👋</h2>
-                <p class="text-gray-500 mb-8">Choisissez un agrès pour commencer la séance.</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div v-for="agre in uniqueAgres" :key="agre" @click="toggleCategory(agre, getActions(agre)[0]); isSidebarOpen = true" 
-                         class="agre-card group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-xl transition-all h-64 relative">
-                        <div class="absolute inset-0 bg-gray-200">
-                             <img :src="'images/' + agre + '.jpg'" class="w-full h-full object-cover filter brightness-90 group-hover:brightness-100 transition-all duration-700">
-                        </div>
-                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
-                        <div class="absolute bottom-0 left-0 right-0 p-6 text-white">
-                            <h3 class="text-2xl font-black tracking-wider uppercase">{{ agre }}</h3>
-                            <p class="text-white/80 text-sm">{{ getAgreCount(agre) }} éléments disponibles</p>
-                        </div>
-                    </div>
-                </div>
+                </section>
             </div>
         </div>
-
     </main>
 
     <transition name="fade">
-        <div v-if="modal.open" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-sm" @click.self="closeModal">
-            <div class="bg-white w-full max-w-5xl max-h-[90vh] rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row relative">
+        <div v-if="modal" class="fixed inset-0 z-[100] bg-slate-900/95 flex items-center justify-center p-4" @click.self="closeModal">
+            <div class="bg-white w-full max-w-6xl rounded-[3rem] overflow-hidden shadow-2xl relative flex flex-col md:flex-row h-[90vh] md:h-auto overflow-y-auto md:overflow-hidden">
+                <button @click="closeModal" class="absolute top-6 right-6 z-10 w-12 h-12 bg-black/10 rounded-full flex items-center justify-center hover:bg-black/20 transition"><i class="fas fa-times text-xl"></i></button>
                 
-                <button @click="closeModal" class="absolute top-4 right-4 z-20 bg-white/10 text-white w-10 h-10 rounded-full flex items-center justify-center hover:bg-black/50">
-                    <i class="fas fa-times"></i>
-                </button>
-
-                <div class="md:w-2/3 bg-black flex items-center justify-center relative border-r group/modal">
-                    <img v-if="modalVideoSrc" :src="modalVideoSrc" class="max-h-[50vh] md:max-h-full w-full object-contain" :key="modal.currentView">
-                    
-                    <div class="absolute top-4 right-4 bg-black/60 text-white text-[10px] font-bold px-3 py-1 rounded-full border border-white/20">
-                        {{ modal.currentView === 'face' ? 'VUE DE FACE' : 'VUE DE PROFIL' }}
-                    </div>
-
-                    <div class="absolute bottom-4 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover/modal:opacity-100 transition-opacity">
-                        <button @click.stop="forceModalView('face')" :class="['px-4 py-1.5 rounded-full text-xs font-bold', modal.currentView === 'face' ? 'bg-white text-black' : 'bg-black/60 text-white']">Face</button>
-                        <button @click.stop="forceModalView('profil')" :class="['px-4 py-1.5 rounded-full text-xs font-bold', modal.currentView === 'profil' ? 'bg-white text-black' : 'bg-black/60 text-white']">Profil</button>
-                    </div>
-                    
-                    <div v-if="modal.type === 'etape'" class="absolute top-4 left-4 bg-indigo-600 text-white px-4 py-1.5 rounded-full text-xs font-bold">ÉTAPE {{ modal.number }}</div>
-                    <div v-if="modal.type === 'erreur'" class="absolute top-4 left-4 bg-red-600 text-white px-4 py-1.5 rounded-full text-xs font-bold">ERREUR TYPE</div>
+                <div class="md:w-1/2 bg-black flex items-center justify-center aspect-video md:aspect-auto">
+                    <img :src="'IMAGES/'+currentFile(modal.data, modalView)" class="w-full h-full object-contain">
                 </div>
-
-                <div class="md:w-1/3 p-8 overflow-y-auto bg-white flex flex-col">
-                    <h3 :class="['text-2xl font-black leading-tight mb-6', modal.type === 'erreur' ? 'text-red-600' : 'text-gray-800']">
-                        {{ modal.data.nom || modal.data.titre }}
-                    </h3>
+                
+                <div class="md:w-1/2 p-8 md:p-12 flex flex-col justify-center overflow-y-auto hide-scrollbar">
+                    <span class="text-blue-600 font-black text-[10px] uppercase mb-2 tracking-widest">{{ modal.type }}</span>
+                    <h2 class="text-3xl font-black uppercase mb-8 leading-tight">{{ modal.data.nom || modal.data.titre }}</h2>
                     
-                    <div v-if="modal.type === 'etape'" class="flex-1">
-                        <ul class="space-y-4">
-                            <li v-for="(c, i) in cleanList(modal.data.criteres)" :key="i" class="flex items-start text-sm text-gray-700 bg-gray-50 p-3 rounded-lg">
-                                <span class="bg-indigo-100 text-indigo-700 w-5 h-5 flex items-center justify-center rounded-full text-[10px] font-bold mr-3 mt-0.5">{{ i+1 }}</span>
-                                {{ c }}
-                            </li>
-                        </ul>
-                    </div>
-
-                    <div v-if="modal.type === 'erreur'" class="flex-1">
-                        <div class="mb-6 text-sm">
-                            <h4 class="font-bold text-gray-900 uppercase text-xs mb-2">Observation</h4>
-                            <p class="text-gray-600 italic border-l-4 border-red-200 pl-4">"{{ modal.data.indicateur }}"</p>
+                    <div v-if="modal.type === 'Élément'" class="space-y-8">
+                        <div>
+                            <p class="text-[10px] font-black text-blue-600 uppercase mb-3 italic">Comment faire ?</p>
+                            <ul class="space-y-2">
+                                <li v-for="c in modal.data.criteres_realisation" class="text-sm font-bold text-slate-700 italic flex gap-3">
+                                    <i class="fas fa-chevron-right text-blue-400 mt-1 shrink-0 text-[10px]"></i> {{ c }}
+                                </li>
+                            </ul>
                         </div>
-                        <div class="bg-green-50 p-5 rounded-xl border border-green-100">
-                            <h4 class="font-bold text-green-800 text-xs mb-2 uppercase">Solution</h4>
-                            <p class="text-sm text-green-900 font-medium">{{ modal.data.correction }}</p>
+                        <div>
+                            <p class="text-[10px] font-black text-emerald-600 uppercase mb-3 italic">C'est réussi si...</p>
+                            <ul class="space-y-2">
+                                <li v-for="c in modal.data.criteres_reussite" class="text-sm font-bold text-slate-700 flex gap-3">
+                                    <i class="fas fa-check-circle text-emerald-500 mt-1 shrink-0 text-[10px]"></i> {{ c }}
+                                </li>
+                            </ul>
                         </div>
                     </div>
-                    
-                    <button @click="closeModal" class="mt-8 w-full py-3 bg-gray-100 hover:bg-gray-200 text-gray-800 font-bold rounded-lg text-sm uppercase">Fermer</button>
+
+                    <div v-if="modal.data.correction" class="bg-amber-50 p-6 rounded-[2rem] border border-amber-100">
+                        <p class="text-[10px] font-black text-amber-700 uppercase mb-2 italic">Conseil de correction :</p>
+                        <p class="text-base font-bold text-amber-900 italic leading-snug">{{ modal.data.correction }}</p>
+                    </div>
+
+                    <div v-if="modal.type === 'Étape'" class="text-slate-500 italic text-sm font-medium">
+                        Travaillez cette étape pour maîtriser l'élément complet.
+                    </div>
                 </div>
             </div>
         </div>
     </transition>
-
 </div>
 
 <script>
-    const { createApp } = Vue;
-    createApp({
-        data() {
-            return {
-                gymData: typeof gymData !== 'undefined' ? gymData : [],
-                openCategory: null,
-                currentElement: null,
-                isSidebarOpen: window.innerWidth >= 1024, 
-                currentView: 'face', 
-                videoTimer: null,
-                baseImagePath: 'images/',
-                modal: { open: false, data: null, type: null, number: 0, currentView: 'face', timer: null }
+const { createApp } = Vue;
+createApp({
+    data() {
+        return { isSidebarOpen: true, curr: null, openFolders: [], globalView: 'face', modalView: 'face', globalTimer: null, modalTimer: null, modal: null }
+    },
+    methods: {
+        getActions(agre) { return [...new Set(gymData.filter(d => d.agre === agre).map(d => d.action))]; },
+        getElements(a, ac) { return gymData.filter(d => d.agre === a && d.action === ac); },
+        toggleFolder(k) { const i = this.openFolders.indexOf(k); i > -1 ? this.openFolders.splice(i, 1) : this.openFolders.push(k); },
+        openAgre(a) { this.isSidebarOpen = true; this.openFolders = [a + this.getActions(a)[0]]; this.curr = null; },
+        currentFile(item, view) { if (!item?.media) return ''; const m = item.media; return (view === 'face' && m.face) ? m.face : (m.profil || m.face); },
+        selectElement(el) {
+            this.curr = el; this.globalView = 'face'; 
+            if(this.globalTimer) clearInterval(this.globalTimer);
+            if(el.media.face && el.media.profil) {
+                this.globalTimer = setInterval(() => { this.globalView = (this.globalView === 'face' ? 'profil' : 'face'); }, 4000);
+            }
+            if(window.innerWidth < 1024) this.isSidebarOpen = false;
+        },
+        openModal(item, type) {
+            this.modal = { data: item, type: type };
+            this.modalView = 'face';
+            if(this.modalTimer) clearInterval(this.modalTimer);
+            if(item.media && item.media.face && item.media.profil) {
+                this.modalTimer = setInterval(() => { this.modalView = (this.modalView === 'face' ? 'profil' : 'face'); }, 4000);
             }
         },
-        computed: {
-            uniqueAgres() { return [...new Set(this.gymData.map(item => item.agre))].sort(); },
-            currentVideoSrc() {
-                if (!this.currentElement) return '';
-                const m = this.currentElement.media;
-                if (this.currentView === 'face' && m.face) return this.baseImagePath + m.face;
-                if (this.currentView === 'profil' && m.profil) return this.baseImagePath + m.profil;
-                return this.baseImagePath + (m.face || m.profil);
-            },
-            modalVideoSrc() {
-                if (!this.modal.data || !this.modal.data.media) return null;
-                const m = this.modal.data.media;
-                if (this.modal.currentView === 'face' && m.face) return this.baseImagePath + m.face;
-                if (this.modal.currentView === 'profil' && m.profil) return this.baseImagePath + m.profil;
-                return this.baseImagePath + (m.face || m.profil || m.img_name);
-            }
-        },
-        methods: {
-            getActions(agre) { return [...new Set(this.gymData.filter(i => i.agre === agre).map(i => i.action))].sort(); },
-            getElements(agre, action) { return this.gymData.filter(i => i.agre === agre && i.action === action); },
-            getAgreCount(agre) { return this.gymData.filter(i => i.agre === agre).length; },
-            formatName(name) { return name.replace(/_/g, ' '); },
-            toggleCategory(agre, action) { const key = agre + action; this.openCategory = (this.openCategory === key) ? null : key; },
-            
-            selectElement(elem) {
-                this.currentElement = elem;
-                if(window.innerWidth < 1024) this.isSidebarOpen = false;
-                this.startVideoLoop();
-            },
-            startVideoLoop() {
-                if(this.videoTimer) clearInterval(this.videoTimer);
-                this.currentView = 'face';
-                this.videoTimer = setInterval(() => {
-                    if (this.currentElement?.media.face && this.currentElement?.media.profil) {
-                        this.currentView = (this.currentView === 'face') ? 'profil' : 'face';
-                    }
-                }, 4000);
-            },
-            forceView(view) { clearInterval(this.videoTimer); this.currentView = view; },
-
-            startModalVideoLoop() {
-                if(this.modal.timer) clearInterval(this.modal.timer);
-                this.modal.currentView = 'face';
-                const m = this.modal.data.media;
-                if (m && m.face && m.profil) {
-                    this.modal.timer = setInterval(() => {
-                        this.modal.currentView = (this.modal.currentView === 'face') ? 'profil' : 'face';
-                    }, 4000);
-                }
-            },
-            forceModalView(view) { clearInterval(this.modal.timer); this.modal.currentView = view; },
-
-            cleanList(list) { return list ? list.filter(i => i && i.trim() !== '') : []; },
-            getMediaThumbnail(mediaObj) {
-                if (!mediaObj) return '';
-                return this.baseImagePath + (mediaObj.face || mediaObj.profil || mediaObj.img_name);
-            },
-            openModal(item, type, number = 0) {
-                this.modal.data = item; this.modal.type = type; this.modal.number = number;
-                this.modal.open = true; this.startModalVideoLoop();
-            },
-            closeModal() { clearInterval(this.modal.timer); this.modal.open = false; }
-        }
-    }).mount('#app');
+        closeModal() { clearInterval(this.modalTimer); this.modal = null; }
+    }
+}).mount('#app');
 </script>
 </body>
 </html>
